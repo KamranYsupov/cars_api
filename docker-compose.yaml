@@ -1,0 +1,62 @@
+version: '3.8'
+
+x-function: &python
+  build:
+    context: .
+    dockerfile: backend.dockerfile
+  volumes:
+    - ./:/cars_api
+  environment:
+    - DB_HOST=${DB_HOST}
+    - DB_NAME=${DB_NAME}
+    - DB_USER=${DB_USER}
+    - DB_PASS=${DB_PASS}
+  env_file:
+    .env
+  depends_on:
+    - postgres
+    - rabbitmq
+    - redis
+
+services:
+  web-app:
+    <<: *python
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/cars_api
+
+    command: >
+      sh -c "python manage.py migrate --noinput && \
+      python manage.py runserver 0.0.0.0:8000"
+
+  worker:
+    <<: *python
+    hostname: worker
+    entrypoint: celery
+    command: >
+      -A core worker -l info
+    links:
+      - rabbitmq
+      - redis
+
+  postgres:
+    image: postgres:14.6-alpine
+    environment:
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_HOST_AUTH_METHOD=trust
+
+  rabbitmq:
+    image: rabbitmq:management
+    restart: always
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+
+  redis:
+    image: redis:latest
+    hostname: redis
+    ports:
+      - '6379:6379'
