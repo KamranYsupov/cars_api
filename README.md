@@ -181,7 +181,7 @@
 {
   "username": "{User.username}",
   "email": "{User.email}",
-  "password": "{password}",
+  "password": "{User.password}",
   "language": "{Language.id}"
 }
 ```
@@ -205,7 +205,7 @@
 ```json
 {
   "email": "{User.email}",
-  "password": "{password}",
+  "password": "{User.password}",
 }
 ```
 
@@ -255,7 +255,7 @@
 {
     "name": "{CaTranslatedName.name}",
     "car": {
-        "creation_year": "{Car.creation_year"
+        "creation_year": "{Car.creation_year}"
     },
     "language": "{Language.id}"
 }
@@ -265,6 +265,15 @@
 <b>output data: </b>
 
 ```json
+{
+    "name": "{CaTranslatedName.name}",
+    "car": {
+        "id": "{Car.id}",
+        "creation_year": "{Car.creation_year}",
+        "time_add": "{Car.time_add}"
+    },
+    "language": "{Language.id}"
+}
 ```
 
 
