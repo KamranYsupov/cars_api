@@ -132,7 +132,7 @@
             "id": "{Car.id}",
             "creation_year": "{Car.creation_year}",
             "time_add": "{Car.time_add}",
-            "name": "{Car.name}"
+            "name": "{CarTranslatedName.name}"
         }
     ]
 }

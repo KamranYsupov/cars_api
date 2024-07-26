@@ -135,6 +135,7 @@ class UserAPITestCase(APITestCase):
 
     def test_user_cars_api_view(self):
         """Проверка эндпоинта UserCarsAPIView и add_car_to_user_api_view"""
+        self.user_data['language'] = self.russian
         test_user = User.objects.create_user(**self.user_data)
         test_user.save()
 
@@ -143,15 +144,20 @@ class UserAPITestCase(APITestCase):
 
         car_1 = Car.objects.create(creation_year=2024)
 
-        car_translated_name_1 = CarTranslatedName.objects.create(
+        car_1_russian_name = CarTranslatedName.objects.create(
             name='Название на русском',
             car=car_1,
             language=self.russian
         )
+        car_1_english_name = CarTranslatedName.objects.create(
+            name='Name in English',
+            car=car_1,
+            language=self.english
+        )
 
         car_2 = Car.objects.create(creation_year=2023)
 
-        car_translated_name_2 = CarTranslatedName.objects.create(
+        car_2_english_name = CarTranslatedName.objects.create(
             name='Name in English',
             car=car_2,
             language=self.english
@@ -175,11 +181,12 @@ class UserAPITestCase(APITestCase):
         self.assertIn(car_2, test_user.cars.all())
 
         self.assertEqual(add_cars_response.data['cars'], add_cars_data['cars'])
+
         self.assertEqual(
             get_user_cars_response.data['cars'][0]['name'],
-            'This car`s name is not supported in username` language'
+            car_1_russian_name.name
         )
         self.assertEqual(
             get_user_cars_response.data['cars'][1]['name'],
-            car_translated_name_2.name
+            f'This car`s name is not supported in {test_user.username}`s language'
         )
